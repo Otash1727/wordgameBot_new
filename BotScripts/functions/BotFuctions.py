@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from BotScripts.create_bot import bot
-from wordgame.models import MatchList,GamersList,ChempionsList,EnglishDictionary
+from wordgame.models import MatchList,GamersList,ChempionsList
 import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest.settings')
@@ -99,18 +99,26 @@ def delete_queue(match_id):
         i.queue=1
         i.save()
 
+
+def new_queue(match_id):
+    data=MatchList.objects.filter(match_ID=match_id)
+    for i in data:
+        return i.queue
+
 def name_queue(match_id,queue):
     data=GamersList.objects.filter(match_ID=match_id,queue=queue)
     for i in data:
-        return i.user_name
+        return i.user_name  
+        
+def found_word(match_id,text):
+    data=MatchList.objects.filter(match_ID=match_id)
+    for i in data:
+        i.founded_words=text
 
 def finished():
     last_match=MatchList.objects.last()
     return last_match.finished
 
-def dictionary1(message):
-    word=EnglishDictionary.objects.all()
-    return word
 
 def game_info(callback):    
     data=GamersList.objects.filter(user_id=callback).last()

@@ -13,6 +13,7 @@ class MatchList(models.Model):
     players_count=models.IntegerField(null=True,blank=True)
     word_count=models.IntegerField(null=True,blank=True)
     queue=models.PositiveIntegerField(default=1)
+    founded_words=models.CharField(max_length=3000,null=True,blank=True)
     start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     progress=models.CharField(max_length=20,default='no active')

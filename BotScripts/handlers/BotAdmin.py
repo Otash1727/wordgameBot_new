@@ -170,6 +170,7 @@ async def empty_handler(message:Message):
                     if message.text.capitalize() in i and len(message.text)>1:
                         word=True
                         BotFuctions.count_queue(match_id=last_id.match_ID)
+                        BotFuctions.found_word(match_id=last_id.match_ID,text=message.text.lower())
                         if last_id.queue==count:
                             print(last_id.queue,'equals')
                             BotFuctions.delete_queue(match_id=last_id.match_ID)
@@ -177,12 +178,10 @@ async def empty_handler(message:Message):
                     else:
                         pass 
             if word==True:
-                get_name=BotFuctions.name_queue(match_id=last_id.match_ID,queue=data)
-                print(get_name)
-                await bot.send_message(chat_id=chat_id,text=f"<b>{get_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
-                
                 print('keyingi navbat')
-                print(get_name)
+                new_queue=BotFuctions.new_queue(match_id=last_id.match_ID)
+                get_name=BotFuctions.name_queue(match_id=last_id.match_ID,queue=new_queue)
+                await bot.send_message(chat_id=chat_id,text=f"<b>{get_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
             else:
                 ID=message.message_id
                 await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
