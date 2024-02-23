@@ -8,8 +8,9 @@ from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
 from BotScripts.functions import BotFuctions
 
-import csv
+import csv,re
 csv.field_size_limit(1000000)
+
 
 
 
@@ -163,6 +164,7 @@ async def empty_handler(message:Message):
     data=BotFuctions.get_queue(match_id=last_id.match_ID,user_id=message.from_user.id)
     print(last_id.queue,data,'equals')
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and last_id.queue==data:            
+            
             word=False
             with open('englishDictionary.csv',mode='r') as de:
                 csvfile=csv.reader(de)
@@ -170,7 +172,13 @@ async def empty_handler(message:Message):
                     if message.text.capitalize() in i and len(message.text)>1:
                         word=True
                         BotFuctions.count_queue(match_id=last_id.match_ID)
-                        BotFuctions.found_word(match_id=last_id.match_ID,text=message.text.lower())
+                       
+                        #BotFuctions.found_word(match_id=last_id.match_ID,text=message.text)
+                       
+                        #if x:
+                        #    print('exists')
+                        #else:
+                        #    print('not exists')
                         if last_id.queue==count:
                             print(last_id.queue,'equals')
                             BotFuctions.delete_queue(match_id=last_id.match_ID)
