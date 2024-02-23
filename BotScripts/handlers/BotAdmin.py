@@ -8,7 +8,7 @@ from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
 from BotScripts.functions import BotFuctions
 
-import csv,re
+import csv,re,json,itertools
 csv.field_size_limit(1000000)
 
 
@@ -164,35 +164,42 @@ async def empty_handler(message:Message):
     data=BotFuctions.get_queue(match_id=last_id.match_ID,user_id=message.from_user.id)
     print(last_id.queue,data,'equals')
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and last_id.queue==data:            
-            
-            word=False
-            with open('englishDictionary.csv',mode='r') as de:
-                csvfile=csv.reader(de)
-                for i in csvfile:
-                    if message.text.capitalize() in i and len(message.text)>1:
-                        word=True
+            word=[False,'not exists']
+            de=open('englishDictionary.csv',mode='r') 
+            csvfile=csv.reader(de)
+            wordss=open('found_word.text','r')
+            get_words=wordss.readlines()
+            for i,i2 in itertools.product(csvfile,get_words):
+                if message.text.capitalize() in i and len(message.text)>1:
+                    if message.text not in i2:
+                        word[0]=True
                         BotFuctions.count_queue(match_id=last_id.match_ID)
-                       
-                        #BotFuctions.found_word(match_id=last_id.match_ID,text=message.text)
-                       
-                        #if x:
-                        #    print('exists')
-                        #else:
-                        #    print('not exists')
+                        dd={f'{last_id.match_ID}':f"{message.text}"}
+                        with open('found_word.text','a') as foo:
+                            foo.write(json.dumps(dd))
+
                         if last_id.queue==count:
                             print(last_id.queue,'equals')
                             BotFuctions.delete_queue(match_id=last_id.match_ID)
                         break  
-                    else:
-                        pass 
-            if word==True:
+                    elif message.text in i2:
+                        word[1]='exists'
+                        break
+                else:
+                    pass 
+          
+            if word[0]==True:
                 print('keyingi navbat')
                 new_queue=BotFuctions.new_queue(match_id=last_id.match_ID)
                 get_name=BotFuctions.name_queue(match_id=last_id.match_ID,queue=new_queue)
                 await bot.send_message(chat_id=chat_id,text=f"<b>{get_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
+            elif word[1]=='exists':
+                ID=message.message_id
+                await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f'This word has been used before\nPlease write another word\n send a word for <b>{message.text[-1].upper()}</b>',parse_mode=ParseMode.HTML)
             else:
                 ID=message.message_id
                 await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
+   
     elif message.from_user.id in [i.user_id  for i in show_player]:
         await bot.send_message(chat_id=chat_id,text=f"Sorry {message.from_user.full_name},it's not your turn\nPlease wait\nit's your turn-{data}")
     else:   
