@@ -173,6 +173,7 @@ async def empty_handler(message:Message):
                 if message.text.capitalize() in i and len(message.text)>1:
                     if message.text not in i2:
                         word[0]=True
+                        print(i2.split(':'))
                         BotFuctions.count_queue(match_id=last_id.match_ID)
                         dd={f'{last_id.match_ID}':f"{message.text}"}
                         with open('found_word.text','a') as foo:
