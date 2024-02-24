@@ -110,11 +110,21 @@ def name_queue(match_id,queue):
     for i in data:
         return i.user_name  
         
-#def found_word(match_id,text):
-#    data=MatchList.objects.get(match_ID=match_id)
-#    data.founded_words=data.founded_words,text
-#    data.save()
+def found_word(match_id,text,last_letter):
+    data=MatchList.objects.get(match_ID=match_id)
+    data.founded_words=data.founded_words+text
+    data.last_latter=last_letter
+    data.save()
     
+
+
+async def get_words(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    return data.founded_words
+
+def last_letter(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    return data.last_latter
 
 def count_attemp(match_id,user_id):
     data=GamersList.objects.filter(match_ID=match_id,user_id=user_id)

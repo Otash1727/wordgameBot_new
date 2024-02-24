@@ -157,6 +157,7 @@ async def start_game(callback:CallbackQuery):
 async def empty_handler(message:Message):
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
+    get_words=await BotFuctions.get_words(match_id=last_id.match_ID)
     show_player=BotFuctions.show_players(match_id=last_id.match_ID) 
     count=show_player.count()
     print("O'yinchilar soni",count)
@@ -167,23 +168,20 @@ async def empty_handler(message:Message):
             word=[False,'not exists']
             de=open('englishDictionary.csv',mode='r') 
             csvfile=csv.reader(de)
-            wordss=open('found_word.text','r')
-            get_words=wordss.readlines()
-            for i,i2 in itertools.product(csvfile,get_words):
-                if message.text.capitalize() in i and len(message.text)>1:
-                    if message.text not in i2:
+            word_split=get_words.split('""')
+            print(word_split)
+            for i in csvfile:   
+                if str(message.text.capitalize()) in i and len(message.text)>1:
+                    if message.text not in word_split:
                         word[0]=True
-                        print(i2.split(':'))
                         BotFuctions.count_queue(match_id=last_id.match_ID)
-                        dd={f'{last_id.match_ID}':f"{message.text}"}
-                        with open('found_word.text','a') as foo:
-                            foo.write(json.dumps(dd))
-
+                        BotFuctions.found_word(match_id=last_id.match_ID,text=json.dumps(message.text),last_letter=message.text[-1])
+                        
                         if last_id.queue==count:
                             print(last_id.queue,'equals')
                             BotFuctions.delete_queue(match_id=last_id.match_ID)
                         break  
-                    elif message.text in i2:
+                    elif str(message.text) in word_split:
                         word[1]='exists'
                         break
                 else:
@@ -194,9 +192,11 @@ async def empty_handler(message:Message):
                 new_queue=BotFuctions.new_queue(match_id=last_id.match_ID)
                 get_name=BotFuctions.name_queue(match_id=last_id.match_ID,queue=new_queue)
                 await bot.send_message(chat_id=chat_id,text=f"<b>{get_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
+                print(word_split,'oxirgi')
             elif word[1]=='exists':
                 ID=message.message_id
-                await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f'This word has been used before\nPlease write another word\n send a word for <b>{message.text[-1].upper()}</b>',parse_mode=ParseMode.HTML)
+                last_letter=BotFuctions.last_letter(match_id=last_id.match_ID)
+                await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f'This word has been used before\nPlease write another word\n send a word for <b>{last_letter.upper()}</b>',parse_mode=ParseMode.HTML)
             else:
                 ID=message.message_id
                 await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
