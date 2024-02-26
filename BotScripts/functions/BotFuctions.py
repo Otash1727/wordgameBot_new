@@ -108,19 +108,25 @@ def new_queue(match_id):
 def name_queue(match_id,queue):
     data=GamersList.objects.filter(match_ID=match_id,queue=queue)
     for i in data:
-        return i.user_name  
-        
-def found_word(match_id,text,last_letter):
+        return i.user_name
+    
+              
+def found_word(match_id,text):
     data=MatchList.objects.get(match_ID=match_id)
     data.founded_words=data.founded_words+text
-    data.last_latter=last_letter
     data.save()
-    
-
-
-async def get_words(match_id):
+    data2=MatchList.objects.filter(match_ID=match_id)
+    return data2
+       
+def found_word_save(match_id,text,last_letter):
     data=MatchList.objects.get(match_ID=match_id)
-    return data.founded_words
+    data.founded_words_save=data.founded_words_save+text
+    data.last_latter=last_letter
+    data.save()    
+
+
+
+
 
 def last_letter(match_id):
     data=MatchList.objects.get(match_ID=match_id)
