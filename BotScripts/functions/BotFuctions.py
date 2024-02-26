@@ -105,6 +105,9 @@ def new_queue(match_id):
     for i in data:
         return i.queue
 
+def last_queue(march_id,queue):
+    data=MatchList.objects.get(match_ID=march_id)
+
 def name_queue(match_id,queue):
     data=GamersList.objects.filter(match_ID=match_id,queue=queue)
     for i in data:
