@@ -164,13 +164,15 @@ async def empty_handler(message:Message):
     #queue users
     data=BotFuctions.get_queue(match_id=last_id.match_ID,user_id=message.from_user.id)
     print(last_id.queue,data,'equals')
-    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and (last_id.queue==data):            
+    attemp_count=BotFuctions.count_attemp(match_id=last_id.match_ID,user_id=message.from_user.id)
+    data2=BotFuctions.game_info(callback=message.from_user.id)
+    print(data2.finished)
+    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and (last_id.queue==data) and data2.finished==False:            
             episode_one=False
             episode_two=[False,False]
             dd=open('englishDictionary.csv',mode='r') 
             csvfile=csv.reader(dd)
             last_letter=BotFuctions.last_letter(match_id=last_id.match_ID)
-            print(last_letter)
             for i in csvfile:   
                 if str(message.text.capitalize()) in i and len(message.text)>1:
                     episode_one=True
@@ -183,7 +185,7 @@ async def empty_handler(message:Message):
                         print(last_id.queue,'equals')
                         BotFuctions.delete_queue(match_id=last_id.match_ID)
             
-
+            # message text rigth or wrong 
             if episode_one==True:
                 print('hello')
                 gg=BotFuctions.found_word(match_id=last_id.match_ID,text=json.dumps(message.text))
@@ -200,13 +202,34 @@ async def empty_handler(message:Message):
             
 
             else:
-                print('bye bye')
-                ID=message.message_id
-                await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
-   #
-            
+                BotFuctions.chance_over(match_id=last_id.match_ID,user_id=message.from_user.id)
+                attemp_count=BotFuctions.count_attemp(match_id=last_id.match_ID,user_id=message.from_user.id)
+                if attemp_count!=0:
+                    attemp_count=BotFuctions.count_attemp(match_id=last_id.match_ID, user_id=message.from_user.id)
+                    ID=message.message_id
+                    await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
+                    
+                else:
+                    win_user=BotFuctions.win_user(match_id=last_id.match_ID)
+                    ddd=win_user.count()
+                    
+                    if ddd==1:
+                        for i1 in win_user:
+                            pass
+                        #await bot.send_message(f'<spoiler><b>{i1.user_name}</b></spoiler> You win ')
+                        await bot.send_message(chat_id=chat_id,text='<b>You lose</b>',parse_mode=ParseMode.HTML)
+                        BotFuctions.finished_users(match_id=last_id.match_ID,user_id=message.from_user.id)
+                        print('bye bye')
+                    
+
+
+
+
+        # words function
+
             if episode_two[0]==True:
-                pass
+                last_letter=BotFuctions.last_letter(match_id=last_id.match_ID)
+                print(last_letter)
                 print('keyingi navbat')
                 new_queue=BotFuctions.new_queue(match_id=last_id.match_ID)
                 get_name=BotFuctions.name_queue(match_id=last_id.match_ID,queue=new_queue)
@@ -215,63 +238,8 @@ async def empty_handler(message:Message):
             elif episode_two[1]==True:
                 #next_queue=BotFuctions.name_queue(match_id=last_id.match_ID,queue=)
                 await bot.send_message(chat_id=chat_id,text='this word used before')
-                
-           
+        
 
-            #
-            ##episode one yozilgan so'zni to'gri yoki yo'qligini aniqlaydi
-            #if episode_one==True:
-            #    
-            #    
-#
-#
-#
-            #
-            #else:
-            #    
-#
-#
-#
-#
-#
-            #if episode_two[1]==True:
-            #    ID=message.message_id
-            #    last_letter=BotFuctions.last_letter(match_id=last_id.match_ID)
-            #    await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f'This word has been used before\nPlease write another word\n send a word for <b>{last_letter.upper()}</b>',parse_mode=ParseMode.HTML)
-          #
-#
-            #
-#
-            #            print(message.from_user.id)
-            #        if last_id.queue==count:
-            #            print(last_id.queue,'equals')
-            #            BotFuctions.delete_queue(match_id=last_id.match_ID)
-            #        break  
-            #    elif last_letter==None:
-            #        BotFuctions.count_queue(match_id=last_id.match_ID)
-            #        gg=BotFuctions.found_word(match_id=last_id.match_ID,text=json.dumps(message.text))
-            #        for i in gg:
-            #            pass
-            #        print('hello baby 1')
-            #        word[0]=True
-            #        BotFuctions.found_word_save(match_id=last_id.match_ID,text=json.dumps(message.text),last_letter=message.text[-1])
-            #        word[1]=False
-            #        
-            #        break
-            #    else:
-            #        word[2]=True  
-            #else:
-            #    print('off')
-               
-           
-            #
-            #  #elif word[2]==True:
-            #    await bot.send_message(chat_id=chat_id,text='sen')
-            #else:
-            #
-    elif message.from_user.id in [i.user_id  for i in show_player]:
-        await bot.send_message(chat_id=chat_id,text=f"Sorry {message.from_user.full_name},it's not your turn\nPlease wait\nit's your turn-{data}\n Now it is")
-                  
     else:   
         print('oddiy rejim')
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
@@ -328,6 +296,61 @@ async def empty_handler(message:Message):
     
 
 
+
+            #
+            ##episode one yozilgan so'zni to'gri yoki yo'qligini aniqlaydi
+            #if episode_one==True:
+            #    
+            #    
+#
+#
+#
+            #
+            #else:
+            #    
+#
+#
+#
+#
+#
+            #if episode_two[1]==True:
+            #    ID=message.message_id
+            #    last_letter=BotFuctions.last_letter(match_id=last_id.match_ID)
+            #    await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f'This word has been used before\nPlease write another word\n send a word for <b>{last_letter.upper()}</b>',parse_mode=ParseMode.HTML)
+          #
+#
+            #
+#
+            #            print(message.from_user.id)
+            #        if last_id.queue==count:
+            #            print(last_id.queue,'equals')
+            #            BotFuctions.delete_queue(match_id=last_id.match_ID)
+            #        break  
+            #    elif last_letter==None:
+            #        BotFuctions.count_queue(match_id=last_id.match_ID)
+            #        gg=BotFuctions.found_word(match_id=last_id.match_ID,text=json.dumps(message.text))
+            #        for i in gg:
+            #            pass
+            #        print('hello baby 1')
+            #        word[0]=True
+            #        BotFuctions.found_word_save(match_id=last_id.match_ID,text=json.dumps(message.text),last_letter=message.text[-1])
+            #        word[1]=False
+            #        
+            #        break
+            #    else:
+            #        word[2]=True  
+            #else:
+            #    print('off')
+               
+           
+            #
+            #  #elif word[2]==True:
+            #    await bot.send_message(chat_id=chat_id,text='sen')
+            #else:
+            #
+    #elif message.from_user.id in [i.user_id  for i in show_player]:
+    #    await bot.send_message(chat_id=chat_id,text=f"Sorry {message.from_user.full_name},it's not your turn\nPlease wait\nit's your turn-{data}\n Now it is")
+                  
 
 
  

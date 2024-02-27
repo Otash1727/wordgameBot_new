@@ -64,7 +64,7 @@ def match_info():
     return last_match
 
 def show_players(match_id):
-    data=GamersList.objects.filter(match_ID=match_id)   
+    data=GamersList.objects.filter(match_ID=match_id,finished=False)   
     return data
 
 def start_game1():
@@ -140,7 +140,11 @@ def count_attemp(match_id,user_id):
     for i in data:
         return i.chance
     
-    
+def chance_over(match_id,user_id):
+    data=GamersList.objects.get(match_ID=match_id,user_id=user_id)
+    data.chance=data.chance-1
+    data.save()
+
 def finished():
     last_match=MatchList.objects.last()
     return last_match.finished
@@ -150,7 +154,15 @@ def game_info(callback):
     data=GamersList.objects.filter(user_id=callback).last()
     return data 
 
+def finished_users(match_id,user_id):
+    data=GamersList.objects.get(match_ID=match_id,user_id=user_id)
+    data.finished=True
+    data.save()
 
+
+def win_user(match_id):
+    data=GamersList.objects.filter(match_ID=match_id,finished=False)
+    return data
 def off():
     oddd=GamersList.objects.all()
     oddd.delete()
