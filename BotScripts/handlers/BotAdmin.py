@@ -158,13 +158,16 @@ async def empty_handler(message:Message):
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
     #get_words=await BotFuctions.get_words(match_id=last_id.match_ID)
-    show_player=BotFuctions.show_players(match_id=last_id.match_ID) 
+   
+    count1=BotFuctions.players(user_id=message.from_user.id)
+    print("O'yinchilar soni")
+    show_player=BotFuctions.show_players(match_id=count1) 
     count=show_player.count()
-    print("O'yinchilar soni",count)
+    print(count)
     #queue users
-    data=BotFuctions.get_queue(match_id=last_id.match_ID,user_id=message.from_user.id)
+    data=BotFuctions.get_queue(match_id=count1,user_id=message.from_user.id)
     print(last_id.queue,data,'equals')
-    attemp_count=BotFuctions.count_attemp(match_id=last_id.match_ID,user_id=message.from_user.id)
+    attemp_count=BotFuctions.count_attemp(match_id=count1,user_id=message.from_user.id)
     data2=BotFuctions.game_info(callback=message.from_user.id)
     print(data2.finished)
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and (last_id.queue==data) and data2.finished==False:            

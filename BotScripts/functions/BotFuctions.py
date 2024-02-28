@@ -63,9 +63,18 @@ def match_info():
     last_match=MatchList.objects.last()
     return last_match
 
+def current_match(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    return data
+
 def show_players(match_id):
     data=GamersList.objects.filter(match_ID=match_id,finished=False)   
     return data
+
+def players(user_id,start_game=True):
+    data=GamersList.objects.get(user_id=user_id)
+    return data.match_ID
+
 
 def start_game1():
         last_match=MatchList.objects.last()
