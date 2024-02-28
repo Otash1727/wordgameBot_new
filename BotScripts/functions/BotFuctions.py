@@ -59,14 +59,38 @@ def create_game(chat_id,chat_name,user_id,user_name):
     creator=GamersList(user_id=user_id,user_name=user_name,match_ID=copy_data.match_ID)
     creator.save()
 
+
+
+
 def match_info():
     last_match=MatchList.objects.last()
     return last_match
 
-def current_match(match_id):
-    data=MatchList.objects.get(match_ID=match_id)
+
+def current_game(user_id):
+    try:
+        data=GamersList.objects.get(user_id=user_id,start_game=True)
+        return True
+    except ObjectDoesNotExist:
+        return False
+
+def current_id(user_id):
+    data=GamersList.objects.get(user_id=user_id)
+    data1=MatchList.objects.get(match_ID=data.match_ID)
+    return data1 
+
+def current_user(match_id,user_id):
+    data=GamersList.objects.get(match_ID=match_id,user_id=user_id)
     return data
 
+def current_match(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    return data    
+
+def current_queue(match_id,queue):
+    data=GamersList.objects.get(match_ID=match_id,queue=queue)
+    return data
+    
 def show_players(match_id):
     data=GamersList.objects.filter(match_ID=match_id,finished=False)   
     return data
@@ -157,6 +181,7 @@ def chance_over(match_id,user_id):
 def finished():
     last_match=MatchList.objects.last()
     return last_match.finished
+
 
 
 def game_info(callback):    
